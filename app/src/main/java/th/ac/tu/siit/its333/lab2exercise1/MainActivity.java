@@ -14,7 +14,8 @@ public class MainActivity extends ActionBarActivity {
 
     // expr = the current string to be calculated
     StringBuffer expr;
-
+    int ans;
+    int memory=0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,6 +27,8 @@ public class MainActivity extends ActionBarActivity {
     public void updateExprDisplay() {
         TextView tvExpr = (TextView)findViewById(R.id.tvExpr);
         tvExpr.setText(expr.toString());
+        TextView tvAns = (TextView)findViewById(R.id.tvAns);
+        tvAns.setText(expr.toString());
     }
 
     public void recalculate() {
@@ -36,6 +39,36 @@ public class MainActivity extends ActionBarActivity {
         //reference: http://stackoverflow.com/questions/2206378/how-to-split-a-string-but-also-keep-the-delimiters
         String e = expr.toString();
         String[] tokens = e.split("((?<=\\+)|(?=\\+))|((?<=\\-)|(?=\\-))|((?<=\\*)|(?=\\*))|((?<=/)|(?=/))");
+        int sum = 0;
+        String op = "+";
+        if(e.length()>0) {
+            for (int i = 0; i < tokens.length; i++) {
+                if (i % 2 == 0) {
+                    int x = Integer.parseInt(tokens[i]);
+                    if (op.equals("+")) {
+                        sum = sum + x;
+                    } else if (op.equals("-")) {
+                        sum = sum - x;
+
+                    } else if (op.equals("*")) {
+                        sum = sum * x;
+
+                    } else if (op.equals("/")) {
+                        sum = sum / x;
+
+                    }
+
+                } else {
+                    op = tokens[i];
+
+                }
+
+            }
+        }
+        ans = sum;
+        TextView tvAns = (TextView)findViewById(R.id.tvAns);
+        tvAns.setText(Integer.toString(sum));
+
     }
 
     public void digitClicked(View v) {
@@ -51,6 +84,15 @@ public class MainActivity extends ActionBarActivity {
 
     public void operatorClicked(View v) {
         //IF the last character in expr is not an operator and expr is not "",
+        String f = ((TextView)v).getText().toString();
+        String str = expr.toString();
+        char op = expr.charAt(expr.length()-1);
+        if(!str.equals("")&&(op!='+'&&op!='-'&&op!='*'&&op!='/')){
+            expr.append(f);
+            updateExprDisplay();
+
+        }
+
         //THEN append the clicked operator and updateExprDisplay,
         //ELSE do nothing
     }
@@ -58,8 +100,11 @@ public class MainActivity extends ActionBarActivity {
     public void ACClicked(View v) {
         //Clear expr and updateExprDisplay
         expr = new StringBuffer();
+        ans = 0;
         updateExprDisplay();
-        //Display a toast that the value is cleared
+        //Display a toast that the value is clearer
+
+
         Toast t = Toast.makeText(this.getApplicationContext(),
                 "All cleared", Toast.LENGTH_SHORT);
         t.show();
@@ -69,9 +114,50 @@ public class MainActivity extends ActionBarActivity {
         //Remove the last character from expr, and updateExprDisplay
         if (expr.length() > 0) {
             expr.deleteCharAt(expr.length()-1);
+            recalculate();
             updateExprDisplay();
+
         }
+
     }
+
+    public void equalClicked(View v){
+        TextView tvExpr = (TextView)findViewById(R.id.tvExpr);
+        tvExpr.setText(Integer.toString(ans));
+
+    }
+    public void MaddClicked(View v){
+         memory = memory+ans;
+        Toast t = Toast.makeText(this.getApplicationContext(),
+                "Memory is"+ memory, Toast.LENGTH_SHORT);
+        t.show();
+
+    }
+    public void MsubClicked(View v){
+        memory = memory-ans;
+        Toast t = Toast.makeText(this.getApplicationContext(),
+                "Memory is"+ memory, Toast.LENGTH_SHORT);
+        t.show();
+
+    }
+    public void MrClicked(View v){
+        TextView tvExpr = (TextView)findViewById(R.id.tvExpr);
+        tvExpr.setText(Integer.toString(memory));
+        TextView tvAns = (TextView)findViewById(R.id.tvExpr);
+        tvAns.setText(Integer.toString(memory));
+        Toast t = Toast.makeText(this.getApplicationContext(),
+                "Memory is" + memory, Toast.LENGTH_SHORT);
+        t.show();
+
+    }
+    public void McClicked(View v){
+        memory = 0;
+        Toast t = Toast.makeText(this.getApplicationContext(),
+                "Memory is"+ memory, Toast.LENGTH_SHORT);
+        t.show();
+
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
